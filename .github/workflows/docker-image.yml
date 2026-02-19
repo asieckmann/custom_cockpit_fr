@@ -13,6 +13,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: BlueOS-community/Deploy-BlueOS-Extension@v1.4.0
     - name: Deploy BlueOS Extension
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+      uses: BlueOS-community/Deploy-BlueOS-Extension@v1
+      # specify the desired variables
+      with:
+        docker-username: ${{ secrets.DOCKER_USERNAME }}
+        docker-password: ${{ secrets.DOCKER_PASSWORD }}
+        image-name: 'testcockpit'
