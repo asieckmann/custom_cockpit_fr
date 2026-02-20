@@ -40,3 +40,4 @@ jobs:
           docker-username: ${{ secrets.DOCKER_USERNAME }}
           docker-password: ${{ secrets.DOCKER_PASSWORD }}
           image-name: 'testcockpit'
+          skip-checkout: true
