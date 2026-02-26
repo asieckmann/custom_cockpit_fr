@@ -73,6 +73,21 @@ export class Joystick {
 
     axes = axes.filter((axis) => axis !== undefined)
 
+    // If the gamepad has more axes than the mapping provided (e.g. synthetic trigger),
+    // append those unmapped raw values so they show up in the UI and can be mapped.
+    if (this.gamepad.axes && this.gamepad.axes.length > axes.length) {
+      try {
+        // slice the leftover raw values and push them onto the end of the state array
+        const extra = this.gamepad.axes.slice(axes.length)
+        axes.push(...extra)
+      } catch {
+        // be defensive in case axes is a typed array, convert before slicing
+        const rawAxes = Array.from(this.gamepad.axes)
+        const extra = rawAxes.slice(axes.length)
+        axes.push(...extra)
+      }
+    }
+
     return { buttons, axes }
   }
 }
