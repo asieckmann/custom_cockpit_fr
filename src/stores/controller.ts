@@ -311,6 +311,10 @@ export const useControllerStore = defineStore('controller', () => {
     // Add to transient state
     currentState.axes.push(triggerAxis)
 
+    // debug: log axis arrays so we can see whether the synthetic axis exists
+    console.debug('joystick state axes', currentState.axes)
+    console.debug('gamepad axes (before write)', event.gamepad.axes)
+
     // Write the synthetic axis into the joystick.gamepad.axes at a fixed
     // index so UIs/calibration see it without growing the array every event.
     try {
@@ -328,6 +332,7 @@ export const useControllerStore = defineStore('controller', () => {
         ;(joystick as any).syntheticTriggerIndex = idx
         (joystick.gamepad.axes as unknown as number[])[idx] = triggerAxis
       }
+      console.debug('gamepad axes (after write)', joystick.gamepad.axes)
     } catch (e) {
       console.warn('Could not set synthetic trigger axis on gamepad.axes', e)
     }
