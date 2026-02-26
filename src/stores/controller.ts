@@ -182,6 +182,19 @@ export const useControllerStore = defineStore('controller', () => {
       joysticks.value.set(index, joystick)
       console.info(`Joystick ${index} connected. Model: ${joystick.model} // VID: ${vendor_id} // PID: ${product_id}`)
 
+      // Add a placeholder synthetic trigger axis so mapping UIs and calibration
+      // see the extra axis immediately after connection. Store the index on
+      // the joystick instance to avoid appending repeatedly on state updates.
+      try {
+        if (Array.isArray(joystick.gamepad.axes)) {
+          const syntheticIndex = joystick.gamepad.axes.length
+          ;(joystick as any).syntheticTriggerIndex = syntheticIndex
+          joystick.gamepad.axes[syntheticIndex] = 0
+        }
+      } catch (e) {
+        console.warn('Could not add synthetic trigger axis placeholder on connect', e)
+      }
+
       if (thereWereJoysticksBefore && enableForwarding.value) {
         console.warn('There are joysticks connected and forwarding already. Skipping joystick conflict check.')
         return
@@ -284,11 +297,28 @@ export const useControllerStore = defineStore('controller', () => {
       buttons: [...event.gamepad.buttons.map((button) => button.value)],
     }
 
-    // Custom trigger axis
+    // Custom trigger axis (RT - LT)
     const lt = currentState.buttons[6] ?? 0
     const rt = currentState.buttons[7] ?? 0
     const triggerAxis = rt - lt
+    // Add to transient state
     currentState.axes.push(triggerAxis)
+
+    // Write the synthetic axis into the joystick.gamepad.axes at a fixed
+    // index so UIs/calibration see it without growing the array every event.
+    try {
+      const syntheticIndex = (joystick as any).syntheticTriggerIndex
+      if (typeof syntheticIndex === 'number') {
+        joystick.gamepad.axes[syntheticIndex] = triggerAxis
+      } else if (Array.isArray(joystick.gamepad.axes)) {
+        // Fallback: assign at the end and record the index
+        const idx = joystick.gamepad.axes.length
+        ;(joystick as any).syntheticTriggerIndex = idx
+        joystick.gamepad.axes[idx] = triggerAxis
+      }
+    } catch (e) {
+      console.warn('Could not set synthetic trigger axis on gamepad.axes', e)
+    }
 
     // If joystick forwarding is disabled, disable the callback processing
     if (!enableForwarding.value) return
