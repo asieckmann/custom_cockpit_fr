@@ -21,6 +21,7 @@ import {
   JoysticksMap,
   JoystickStateEvent,
 } from '@/libs/joystick/manager'
+import { mavlinkManualControlAxes } from '@/libs/joystick/protocols/mavlink-manual-control'
 import { allAvailableAxes, allAvailableButtons, performJoystickMappingMigrations } from '@/libs/joystick/protocols'
 import { CockpitActionsFunction, executeActionCallback } from '@/libs/joystick/protocols/cockpit-actions'
 import { modifierKeyActions, otherAvailableActions } from '@/libs/joystick/protocols/other'
@@ -198,6 +199,19 @@ export const useControllerStore = defineStore('controller', () => {
         const syntheticIndex = axes.length
         ;(joystick as any).syntheticTriggerIndex = syntheticIndex
         axes[syntheticIndex] = 0
+        // Hard-code synthetic trigger axis to MAVLink Manual Control Z axis
+        try {
+          const mapping = protocolMapping.value
+          mapping.axesCorrespondencies[syntheticIndex] = {
+            action: mavlinkManualControlAxes.axis_z,
+            min: -1.0,
+            max: 1.0,
+          }
+          protocolMapping.value = mapping
+          console.info(`Hard-mapped synthetic axis ${syntheticIndex} -> MAVLink Z`)
+        } catch (err) {
+          console.warn('Could not hard-map synthetic axis to MAVLink Z', err)
+        }
       } catch (e) {
         console.warn('Could not add synthetic trigger axis placeholder on connect', e)
       }
