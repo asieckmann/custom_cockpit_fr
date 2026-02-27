@@ -199,18 +199,18 @@ export const useControllerStore = defineStore('controller', () => {
         const syntheticIndex = axes.length
         ;(joystick as any).syntheticTriggerIndex = syntheticIndex
         axes[syntheticIndex] = 0
-        // Hard-code synthetic trigger axis to MAVLink Manual Control Z axis
+        // Hard-code synthetic trigger axis to MAVLink Manual Control X axis
         try {
           const mapping = protocolMapping.value
           mapping.axesCorrespondencies[syntheticIndex] = {
-            action: mavlinkManualControlAxes.axis_z,
+            action: mavlinkManualControlAxes.axis_x,
             min: -1.0,
             max: 1.0,
           }
           protocolMapping.value = mapping
-          console.info(`Hard-mapped synthetic axis ${syntheticIndex} -> MAVLink Z`)
+          console.info(`Hard-mapped synthetic axis ${syntheticIndex} -> MAVLink X`)
         } catch (err) {
-          console.warn('Could not hard-map synthetic axis to MAVLink Z', err)
+          console.warn('Could not hard-map synthetic axis to MAVLink X', err)
         }
       } catch (e) {
         console.warn('Could not add synthetic trigger axis placeholder on connect', e)
