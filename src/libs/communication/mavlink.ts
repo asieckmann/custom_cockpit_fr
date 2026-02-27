@@ -52,3 +52,37 @@ export const sendManualControl = (controllerState: MavlinkManualControlState, ta
   }
   sendMavlinkMessage(manualControlMessage)
 }
+
+/**
+ * Send an RC_CHANNELS_OVERRIDE message with optional channel values.
+ * Any channel not specified will be sent as UINT16_MAX (ignore).
+ * Values should be in microseconds (1000-2000 typical).
+ */
+export const sendRcChannelsOverride = (overrides: Partial<Message.RcChannelsOverride>): void => {
+  const MAX = 65535
+  const msg: Message.RcChannelsOverride = {
+    type: MAVLinkType.RC_CHANNELS_OVERRIDE,
+    chan1_raw: overrides.chan1_raw ?? MAX,
+    chan2_raw: overrides.chan2_raw ?? MAX,
+    chan3_raw: overrides.chan3_raw ?? MAX,
+    chan4_raw: overrides.chan4_raw ?? MAX,
+    chan5_raw: overrides.chan5_raw ?? MAX,
+    chan6_raw: overrides.chan6_raw ?? MAX,
+    chan7_raw: overrides.chan7_raw ?? MAX,
+    chan8_raw: overrides.chan8_raw ?? MAX,
+    // required system/component id fields
+    target_system: overrides.target_system ?? 1,
+    target_component: overrides.target_component ?? 1,
+    chan9_raw: overrides.chan9_raw ?? MAX,
+    chan10_raw: overrides.chan10_raw ?? MAX,
+    chan11_raw: overrides.chan11_raw ?? MAX,
+    chan12_raw: overrides.chan12_raw ?? MAX,
+    chan13_raw: overrides.chan13_raw ?? MAX,
+    chan14_raw: overrides.chan14_raw ?? MAX,
+    chan15_raw: overrides.chan15_raw ?? MAX,
+    chan16_raw: overrides.chan16_raw ?? MAX,
+    chan17_raw: overrides.chan17_raw ?? MAX,
+    chan18_raw: overrides.chan18_raw ?? MAX,
+  }
+  sendMavlinkMessage(msg)
+}

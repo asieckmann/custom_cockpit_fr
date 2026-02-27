@@ -26,6 +26,7 @@ import { allAvailableAxes, allAvailableButtons, performJoystickMappingMigrations
 import { CockpitActionsFunction, executeActionCallback } from '@/libs/joystick/protocols/cockpit-actions'
 import { modifierKeyActions, otherAvailableActions } from '@/libs/joystick/protocols/other'
 import { isElectron } from '@/libs/utils'
+import { sendRcChannelsOverride } from '@/libs/communication/mavlink'
 import { Alert, AlertLevel } from '@/types/alert'
 import {
   type GamepadToCockpitStdMapping,
@@ -324,6 +325,18 @@ export const useControllerStore = defineStore('controller', () => {
     const triggerAxis = rt - lt
     // Add to transient state
     currentState.axes.push(triggerAxis)
+
+    // Also send RC override for channel 5 based on this synthetic axis.  Scale
+    // [-1,1] -> [1000,2000] microseconds (1500 center).
+    try {
+      const raw = Math.round(1500 + triggerAxis * 500)
+      // clamp just in case
+      const clipped = Math.min(2000, Math.max(1000, raw))
+      sendRcChannelsOverride({ chan5_raw: clipped })
+      console.log('sent RC_OVERRIDE chan5', clipped)
+    } catch (e) {
+      console.warn('failed to send RC override', e)
+    }
 
     // debug: log axis arrays so we can see whether the synthetic axis exists
     console.debug('joystick state axes', currentState.axes)
