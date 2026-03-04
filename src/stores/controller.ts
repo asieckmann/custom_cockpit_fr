@@ -311,17 +311,26 @@ export const useControllerStore = defineStore('controller', () => {
     const lt = currentState.buttons[6] ?? 0
     const rt = currentState.buttons[7] ?? 0
     const triggerAxis = rt - lt
-    // Add to transient state
     currentState.axes.push(triggerAxis)
+
+    //Custom bumper axis (RB - LB)
+    const lb = currentState.buttons[4] ?? 0
+    const rb = currentState.buttons[5] ?? 0
+    const bumperAxis = rb - lb
+    currentState.axes.push(bumperAxis)
 
     // Also send RC override for channel 5 based on this synthetic axis.  Scale
     // [-1,1] -> [1000,2000] microseconds (1500 center).
     try {
       const raw = Math.round(1500 + triggerAxis * 500)
+      const bump_raw = Math.round(1500 + bumperAxis * 250)
       // clamp just in case
       const clipped = Math.min(2000, Math.max(1000, raw))
+      const bump_clipped = Math.min(2000, Math.max(1000, bump_raw))
       sendRcChannelsOverride({ chan5_raw: clipped })
+      sendRcChannelsOverride({ chan2_raw: bump_clipped })
       console.log('sent RC_OVERRIDE chan5', clipped)
+      console.log('sent RC_OVERRIDE chan2', bump_clipped)
     } catch (e) {
       console.warn('failed to send RC override', e)
     }
