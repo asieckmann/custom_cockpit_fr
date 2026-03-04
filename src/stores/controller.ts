@@ -327,13 +327,12 @@ export const useControllerStore = defineStore('controller', () => {
       // clamp just in case
       const clipped = Math.min(2000, Math.max(1000, raw))
       const bump_clipped = Math.min(2000, Math.max(1000, bump_raw))
-      sendRcChannelsOverride({ chan5_raw: clipped })
-      sendRcChannelsOverride({ chan2_raw: bump_clipped })
-      console.log('sent RC_OVERRIDE chan5', clipped)
-      console.log('sent RC_OVERRIDE chan2', bump_clipped)
+      sendRcChannelsOverride({ chan5_raw: clipped, chan2_raw: bump_clipped })
+      console.log('sent RC_OVERRIDE chan5 and chan2', clipped, bump_clipped)
     } catch (e) {
       console.warn('failed to send RC override', e)
     }
+
 
     // debug: log axis arrays so we can see whether the synthetic axis exists
     console.debug('joystick state axes', currentState.axes)
