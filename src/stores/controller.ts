@@ -313,10 +313,6 @@ export const useControllerStore = defineStore('controller', () => {
     }
 
 
-    // debug: log axis arrays so we can see whether the synthetic axis exists
-    console.debug('joystick state axes', currentState.axes)
-    console.debug('gamepad axes (before write)', event.gamepad.axes)
-
     // If joystick forwarding is disabled, disable the callback processing
     if (!enableForwarding.value) return
 

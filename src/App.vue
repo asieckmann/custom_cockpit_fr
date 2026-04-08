@@ -1,7 +1,5 @@
 <template>
   <v-app>
-    <!-- build-marker: this text should appear if the frontend build includes the latest code -->
-    <div class="build-marker text-red-500 font-bold text-center py-1">CUSTOM BUILD CHECK</div>
     <v-main>
       <div
         v-if="
